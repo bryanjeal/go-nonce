@@ -1,6 +1,6 @@
 {
 	"comment": "",
-	"ignore": "test",
+	"ignore": "test appengine",
 	"package": [
 		{
 			"checksumSHA1": "VZyTiVWrjUEECfjVKXe2xWysWNE=",
@@ -9,7 +9,7 @@
 			"revisionTime": "2017-02-06T16:46:43Z"
 		},
 		{
-			"checksumSHA1": "QD6LqgLz2JMxXqns8TaxtK9AuHs=",
+			"checksumSHA1": "xmGg3ttN2R+k3oITmXDLtGXA/LA=",
 			"path": "github.com/go-sql-driver/mysql",
 			"revision": "2e00b5cd70399450106cec6431c2e2ce3cae5034",
 			"revisionTime": "2016-12-24T12:10:19Z"
@@ -46,17 +46,15 @@
 		},
 		{
 			"checksumSHA1": "vE43s37+4CJ2CDU6TlOUOYE0K9c=",
-			"origin": "github.com/bryanjeal/go-helpers/vendor/golang.org/x/crypto/bcrypt",
 			"path": "golang.org/x/crypto/bcrypt",
-			"revision": "2dd08fbeb493959985b871401e84d6f28ac3bd0b",
-			"revisionTime": "2017-02-06T16:46:43Z"
+			"revision": "77014cf7f9bde4925afeed52b7bf676d5f5b4285",
+			"revisionTime": "2017-01-31T17:37:52Z"
 		},
 		{
 			"checksumSHA1": "JsJdKXhz87gWenMwBeejTOeNE7k=",
-			"origin": "github.com/bryanjeal/go-helpers/vendor/golang.org/x/crypto/blowfish",
 			"path": "golang.org/x/crypto/blowfish",
-			"revision": "2dd08fbeb493959985b871401e84d6f28ac3bd0b",
-			"revisionTime": "2017-02-06T16:46:43Z"
+			"revision": "77014cf7f9bde4925afeed52b7bf676d5f5b4285",
+			"revisionTime": "2017-01-31T17:37:52Z"
 		},
 		{
 			"checksumSHA1": "Y+HGqEkYM15ir+J93MEaHdyFy0c=",
