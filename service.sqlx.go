@@ -16,14 +16,13 @@ package nonce
 
 import (
 	"database/sql"
-	"log"
 	"time"
 
+	"github.com/golang/glog"
 	// handle mysql database
 	_ "github.com/go-sql-driver/mysql"
 	// handle sqlite3 database
 	_ "github.com/mattn/go-sqlite3"
-
 	"github.com/satori/go.uuid"
 )
 
@@ -148,6 +147,10 @@ func (s *nonceService) Get(action string, uid uuid.UUID) (Nonce, error) {
 	return n, nil
 }
 
+func (s *nonceService) Shutdown() {
+	s.quit <- struct{}{}
+}
+
 // saveNonce saves or updates a nonce in the database
 func (s *nonceService) saveNonce(n *Nonce) error {
 	var sqlExec string
@@ -183,24 +186,29 @@ func (s *nonceService) saveNonce(n *Nonce) error {
 // removeExpired removes expired nonces after a certain amount of time.
 func (s *nonceService) removeExpired() {
 	for {
-		sqlDelete := `DELETE FROM nonce WHERE expires_at < $1`
+		select {
+		case <-s.quit:
+			return
+		default:
+			sqlDelete := `DELETE FROM nonce WHERE expires_at < $1`
 
-		t := time.Now()
-		tx, err := s.db.Beginx()
-		if err != nil {
-			log.Println("Error removing Expired Nonces.", err)
-		}
-		_, err = tx.Exec(sqlDelete, t)
-		if err != nil {
-			tx.Rollback()
-			log.Println("Error removing Expired Nonces.", err)
-		}
-		err = tx.Commit()
-		if err != nil {
-			log.Println("Error removing Expired Nonces.", err)
-		}
+			t := time.Now()
+			tx, err := s.db.Beginx()
+			if err != nil {
+				glog.Errorln("Error removing Expired Nonces.", err)
+			}
+			_, err = tx.Exec(sqlDelete, t)
+			if err != nil {
+				tx.Rollback()
+				glog.Errorln("Error removing Expired Nonces.", err)
+			}
+			err = tx.Commit()
+			if err != nil {
+				glog.Errorln("Error removing Expired Nonces.", err)
+			}
 
-		//delay until the next interval
-		time.Sleep(RemoveExpiredInterval)
+			//delay until the next interval
+			time.Sleep(RemoveExpiredInterval)
+		}
 	}
 }

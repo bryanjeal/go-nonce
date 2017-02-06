@@ -66,7 +66,8 @@ type testService interface {
 // Wraper for NewService to make it work with the testService interface
 func newServiceTest(db *sqlx.DB) testService {
 	s := &nonceService{
-		db: db,
+		db:   db,
+		quit: make(chan struct{}),
 	}
 	go s.removeExpired()
 	return s
@@ -84,6 +85,7 @@ func newInMemoryServiceTest() testService {
 			RWMutex:  &sync.RWMutex{},
 			nonceMap: make(map[string]Nonce),
 		},
+		quit: make(chan struct{}),
 	}
 
 	go s.removeExpired()
@@ -328,6 +330,8 @@ func TestServices(t *testing.T) {
 			// Clean Up
 			nonce.TestTeardown()
 		})
+
+		nonce.Shutdown()
 	}
 
 	// Drop the Table(s) we created

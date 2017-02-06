@@ -23,7 +23,7 @@ import (
 	"sync"
 	"time"
 
-	"gitlab.com/bryanjeal/go-helpers"
+	"github.com/bryanjeal/go-helpers"
 
 	// handle mysql database
 	_ "github.com/go-sql-driver/mysql"
@@ -31,7 +31,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 // Errors
@@ -59,6 +59,9 @@ type Service interface {
 
 	// Get takes a uid and action and returns the newest, valid nonce if it exists
 	Get(action string, uid uuid.UUID) (Nonce, error)
+
+	// Shutdown stops the removedExpired() function
+	Shutdown()
 }
 
 // RemoveExpiredInterval can/should be set by applications using nonce.
@@ -79,11 +82,13 @@ type Nonce struct {
 }
 
 type nonceService struct {
-	db *sqlx.DB
+	db   *sqlx.DB
+	quit chan struct{}
 }
 
 type nonceInMemoryService struct {
 	store *inMemStore
+	quit  chan struct{}
 }
 type inMemStore struct {
 	*sync.RWMutex
@@ -94,7 +99,8 @@ type inMemStore struct {
 // See service.sqlx.go for implementation details
 func NewService(db *sqlx.DB) Service {
 	s := &nonceService{
-		db: db,
+		db:   db,
+		quit: make(chan struct{}),
 	}
 	go s.removeExpired()
 	return s
@@ -108,6 +114,7 @@ func NewInMemoryService() Service {
 			RWMutex:  &sync.RWMutex{},
 			nonceMap: make(map[string]Nonce),
 		},
+		quit: make(chan struct{}),
 	}
 	go s.removeExpired()
 	return s

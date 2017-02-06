@@ -127,6 +127,10 @@ func (s *nonceInMemoryService) Get(action string, uid uuid.UUID) (Nonce, error) 
 	return newestN, nil
 }
 
+func (s *nonceInMemoryService) Shutdown() {
+	s.quit <- struct{}{}
+}
+
 // getNonce gets a Nonce from the store
 func (s *nonceInMemoryService) getNonce(token string) (Nonce, error) {
 	s.store.RLock()
@@ -157,17 +161,23 @@ func (s *nonceInMemoryService) saveNonce(n Nonce) Nonce {
 // removeExpired removes expired nonces after a certain amount of time.
 func (s *nonceInMemoryService) removeExpired() {
 	for {
-		t := time.Now()
-		s.store.Lock()
-		for k, v := range s.store.nonceMap {
-			if v.ExpiresAt.Before(t) {
-				delete(s.store.nonceMap, k)
+		select {
+		case <-s.quit:
+			return
+		default:
+			t := time.Now()
+			s.store.Lock()
+			for k, v := range s.store.nonceMap {
+				if v.ExpiresAt.Before(t) {
+					delete(s.store.nonceMap, k)
+				}
+
 			}
+			s.store.Unlock()
 
+			//delay until the next interval
+			time.Sleep(RemoveExpiredInterval)
 		}
-		s.store.Unlock()
 
-		//delay until the next interval
-		time.Sleep(RemoveExpiredInterval)
 	}
 }
