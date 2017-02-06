@@ -126,7 +126,7 @@ func TestServices(t *testing.T) {
 				t.Fatalf("Expected Action to be: %s. Instead got: %s", tNonce.Action, n.Action)
 			}
 			expiresAt := (time.Unix(n.CreatedAt, 0)).Add(tNonce.ExpiresIn).Truncate(time.Second)
-			if n.ExpiresAt != expiresAt {
+			if !n.ExpiresAt.Equal(expiresAt) {
 				t.Fatalf("Expected ExpiresAt to be: %s. Instead got: %s", expiresAt.String(), n.ExpiresAt.String())
 			}
 			if n.IsUsed != false {
