@@ -125,7 +125,7 @@ func TestServices(t *testing.T) {
 			if n.Action != tNonce.Action {
 				t.Fatalf("Expected Action to be: %s. Instead got: %s", tNonce.Action, n.Action)
 			}
-			expiresAt := (time.Unix(n.CreatedAt, 0)).Add(tNonce.ExpiresIn)
+			expiresAt := (time.Unix(n.CreatedAt, 0)).Add(tNonce.ExpiresIn).Truncate(time.Second)
 			if n.ExpiresAt != expiresAt {
 				t.Fatalf("Expected ExpiresAt to be: %s. Instead got: %s", expiresAt.String(), n.ExpiresAt.String())
 			}
@@ -317,11 +317,11 @@ func TestServices(t *testing.T) {
 		})
 
 		t.Run("RemoveExpired", func(t *testing.T) {
-			n, err := nonce.New(tNonce.Action, tNonce.UserID, time.Millisecond)
+			n, err := nonce.New(tNonce.Action, tNonce.UserID, time.Second)
 			if err != nil {
 				t.Fatalf("Expected to add nonce to DB. Instead got the error: %v", err)
 			}
-			time.Sleep(200 * time.Millisecond)
+			time.Sleep(1100 * time.Millisecond)
 			err = nonce.Check(n.Token, tNonce.Action, tNonce.UserID)
 			if err != ErrTokenNotFound {
 				t.Fatalf("Expected ErrTokenNotFound. Instead got: %v", err)

@@ -46,6 +46,7 @@ var (
 // Service is the interface that provides auth methods.
 type Service interface {
 	// NewUserLocal registers a new user by a local account (email and password)
+	// NOTE: time.Duraction is Truncated to the Second due to MySQL Date resolution
 	New(action string, uid uuid.UUID, expiresIn time.Duration) (Nonce, error)
 
 	// Check takes a Nonce token and checks to see if it is valid
