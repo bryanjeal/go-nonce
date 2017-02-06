@@ -9,7 +9,7 @@ vendor: ## Install govendor and sync nonce's vendored dependencies
 	go get github.com/kardianos/govendor
 	govendor sync ${PACKAGE}
 
-check: test-race test386 fmt vet ## Run tests and linters
+check: test-race fmt vet ## Run tests and linters
 
 test386: ## Run tests in 32-bit mode
 	GOARCH=386 govendor test +local
