@@ -321,7 +321,7 @@ func TestServices(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Expected to add nonce to DB. Instead got the error: %v", err)
 			}
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(200 * time.Millisecond)
 			err = nonce.Check(n.Token, tNonce.Action, tNonce.UserID)
 			if err != ErrTokenNotFound {
 				t.Fatalf("Expected ErrTokenNotFound. Instead got: %v", err)
